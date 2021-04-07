@@ -1,0 +1,55 @@
+@startuml
+skinparam monochrome true
+
+actor Client 
+participant BotVCs
+participant Bot1
+participant Bot2
+participant Hub
+participant TowerSKU
+participant TowerKLC
+
+participant vectorC
+
+Client -> Hub : towerHub:hubInit()
+note right
+   Prints HubName(twKLChub) on Terminal
+end note
+Client -> TowerSKU : vcInit({twKLChub,HubNode},false})
+TowerSKU -> Hub :{registerTower TowerPID,SenderPID}
+Client -> TowerKLC : vcInit({twKLChub,HubNode},true})
+TowerKLC -> Hub :{registerTower TowerPID2,SenderPID2}
+Client -> BotVCs : start()
+BotVCs -> BotVCs :read("botVC.cfg")
+BotVCs -> Hub: ping
+alt "Tower nicht erreichbar"
+Hub --> BotVCs : pang
+BotVCs --> Client : nok
+else
+Hub --> BotVCs : pong
+BotVCs -> Bot1 : start()
+
+Bot1 -> Hub : {getID,ReceiverPIDn,PIDn}
+Hub -> TowerKLC : {getID,ReceiverPIDn,PIDn}
+Hub -> TowerSKU : {getID,ReceiverPIDn,PIDn}
+note right
+   Only TowerSKU with
+   silent == false should
+   response the requests
+end note
+TowerSKU --> Hub :{vc,Pnum1,VCList}
+Hub --> Bot1 : {vc,Pnum1,VCList}
+Bot1 -> vectorC : initVT(Pnum1)
+vectorC --> Bot1 : {Pnum1,[<P1>,<P2>,…,<Pn>]}
+
+BotVCs -> Bot2 : start()
+
+Bot2 -> Hub : {getID,ReceiverPIDn2,PIDn2}
+Hub -> TowerKLC : {getID,ReceiverPIDn2,PIDn2}
+Hub -> TowerSKU : {getID,ReceiverPIDn2,PIDn}
+TowerSKU --> Hub :{vc,Pnum2,VCList}
+Hub --> Bot2 : {vc,Pnum2,VCList}
+Bot2 -> vectorC : initVT(Pnum2)
+vectorC --> Bot2 : {Pnum2,[<P1>,<P2>,…,<Pn>]}
+end
+@enduml

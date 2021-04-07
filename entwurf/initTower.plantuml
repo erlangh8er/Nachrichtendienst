@@ -1,0 +1,33 @@
+@startuml
+skinparam monochrome true
+
+actor Client
+participant BotVCs
+participant Bot1
+participant Bot2
+participant Tower
+
+Client -> Tower : vcInit()
+Tower -> Tower : vcInit(false)
+
+Client -> BotVCs : go()
+BotVCs -> BotVCs :read("botVC.cfg")
+BotVCs -> Tower: ping
+alt "Tower nicht erreichbar"
+Tower --> BotVCs : pang
+BotVCs --> Client : nok
+else
+Tower --> BotVCs : pong
+BotVCs -> Bot1 : start()
+Bot1 -> Tower : {getID,ReceiverPIDn,PIDn}
+Tower --> "Bot1" : {vc,Pnum,VCList}
+Bot1 -> vectorC : initVT(Pnum)
+vectorC --> Bot1 : {Pnum,[<P1>,<P2>,…,<Pn>]}
+
+BotVCs -> Bot2 : start()
+Bot2 -> Tower : {getID,ReceiverPIDn,PIDn}
+Tower --> Bot2 : {vc,Pnum2,<VCList>}
+Bot2 -> vectorC : initVT(Pnum2)
+vectorC --> Bot2 : {Pnum2,[<P1>,<P2>,<P3>,…,<Pn>]}
+end
+@enduml

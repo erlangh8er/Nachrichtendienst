@@ -1,0 +1,29 @@
+@startuml
+skinparam monochrome true
+
+box Bot1
+participant Bot
+participant BotManager
+participant BotReceiver
+participant BotSender
+end box
+participant Tower
+Bot --> BotReceiver : startBotReceiver()
+BotReceiver --> BotReceiver : Auf go warten
+BotReceiver --> Bot : botReceiverPID
+Bot --> BotSender : startBotSender(botReceiverPID)
+BotSender --> BotSender : Auf go warten
+BotSender --> Bot : botSenderPID
+Bot --> BotManager : startBotManager(botSenderPID, botReceiverPID)
+Bot --> Bot : logge Manager, Receiver, Sender PIDs
+destroy Bot
+BotManager -> Tower : {getID,ReceiverPIDn,PIDn}
+Tower --> BotManager : {vc,Pnum,VCList}
+BotManager -> vectorC : initVT(Pnum)
+vectorC --> BotManager : {Pnum,[<P1>,<P2>,…,<Pn>]}
+BotManager --> BotReceiver : {go, botManagerPID}
+BotManager --> BotSender : {go, botManagerPID}
+BotManager --> BotManager : Starte Timer für Sendeereignisse
+BotManager --> BotManager : Starte Timer für lokale Ereignisse
+BotManager --> BotManager : Starte Timer für Terminierung
+@enduml

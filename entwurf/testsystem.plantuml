@@ -1,0 +1,52 @@
+@startuml
+skinparam monochrome true
+
+title Lab*.cpt.haw-hamburg.de
+actor Steffen
+participant Lab33
+participant Lab34
+participant Lab35
+participant Lab36
+participant Lab37
+
+activate Steffen
+Steffen -> Lab33 : towerHub:hubInit().
+activate Lab33
+Steffen -> Lab34 : tower:vcInit({twKLChub,'twKLChub@lab33.cpt.haw-hamburg.de'},false).
+note right
+   steffensVCTower
+end note
+activate Lab34
+Lab34 --> Lab33 : {registerTower,Tower,From}
+Steffen -> Lab35 : towerClock:vcInit({twKLChub,'twKLChub@lab33.cpt.haw-hamburg.de'},true).
+note right
+   twKLCclock
+end note
+activate Lab35
+Lab35 --> Lab33 : {registerTower,Tower,From}
+
+Steffen --> Lab36 : botVCs:go().
+activate Lab36
+Lab36 --> Lab36 : botVC:start().
+destroy Lab36
+Steffen --> Lab37 : botVCs:go().
+activate Lab37
+Lab37 --> Lab37 : botVC:start().
+destroy Lab37
+
+Steffen --> Lab34 : steffensVCTower ! {printMessagestamp,self()}.
+Lab34 --> Lab34 : timeMap98.dot
+
+Steffen --> Lab34 : steffensVCTower ! {printTimeLine,4,self()}.
+Lab34 --> Lab34 : timeLine4_42.dot
+Steffen --> Lab35 : twKLCclock ! {printTimeLine,4,self()}.
+Lab35 --> Lab35 : timeLine4_66.dot
+
+Steffen --> Lab34 : steffensVCTower ! kill.
+destroy Lab34
+
+Steffen --> Lab35 : twKLCclock:vcKill().
+destroy Lab35
+Steffen --> Lab33 : towerHub:hubKill().
+destroy Lab33
+@enduml

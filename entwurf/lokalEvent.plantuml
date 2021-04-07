@@ -1,0 +1,19 @@
+@startuml
+skinparam monochrome true
+
+box Bot1
+participant BotManager
+end box
+participant Tower
+participant vectorC
+
+loop localEvent Interval
+'tick
+BotManager --> vectorC : tickVT(VT)
+vectorC --> BotManager : {Pnum1,[P1,P2,...,Pn]}
+'setTimestamp to Tower
+BotManager --> Tower : {setTimestamp, VTn, ReceiverPIDn}
+'
+end
+
+@enduml

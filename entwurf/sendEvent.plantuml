@@ -1,0 +1,51 @@
+@startuml
+skinparam monochrome true
+
+box Bot1
+participant BotManager
+participant BotSender
+end box
+
+box Bot2
+participant BotManager2
+participant BotReceiver2
+end box
+participant Tower
+participant vectorC
+
+loop localSend Interval
+'tick
+BotManager --> BotSender : send
+
+BotSender --> BotManager : {getVCList, SenderPIDn}
+'manager
+' getIDFromTower
+BotManager -> Tower : {getID,ReceiverPIDn,PIDn}
+Tower --> BotManager : {vc,Pnum,VCList}
+' tick
+BotManager --> vectorC : tickVT(VT)
+vectorC --> BotManager : {Pnum1,[P1,P2,...,Pn]}
+' setTimestamp
+BotManager --> Tower : {setTimestamp,VTn,ReceiverPIDn}
+' Rückantwort an Sender
+BotManager --> BotSender : {getVCList,VTn,VCList}
+'Sender
+' shuffle vclist
+BotSender --> BotSender : shuffle(VCList)
+' messageVT an BotReceiver2
+BotSender --> BotReceiver2 : {messageVT,Data,VTn,BotReceiverPID}
+'Receiver
+' sync an Manager
+BotReceiver2 --> BotManager2 : {sync,VTN}
+'Manager
+' tick
+BotManager2 --> vectorC : tickVT(VT)
+vectorC --> BotManager2 : {Pnum1,[P1,P2,...,Pn]}
+' syncVT
+BotManager2 --> vectorC : syncVT(VT,VTn)
+vectorC --> BotManager2 : {Pnum1,[P1,P2,P3,...,Pn]}
+' setMessagestamp an Tower
+BotManager2 --> Tower : {setMessagestamp,VTn,VT,BotReceiverPID2}
+end
+
+@enduml
